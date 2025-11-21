@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val API_KEY = "YOUR_API_KEY"
+        const val API_KEY = "c6a05c4e496df1f1ec3336054d1dbe28"
         const val LOCATION_PERMISSION_REQUEST_CODE = 100
     }
 }

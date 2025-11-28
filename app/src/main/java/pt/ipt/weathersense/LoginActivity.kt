@@ -16,6 +16,7 @@ import pt.ipt.weathersense.network.RetrofitClient
 
 
 
+
 class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,10 +51,14 @@ class LoginActivity : AppCompatActivity() {
                 val response = RetrofitClient.instance.login(AuthRequest(email, pass))
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
+                        val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
+                        val editor = sharedPref.edit()
+                        editor.putString("USER_EMAIL", email)
+                        editor.putBoolean("IS_LOGGED_IN", true)
+                        editor.apply()
                         Toast.makeText(this@LoginActivity, "Login Success!", Toast.LENGTH_SHORT).show()
-                        // Navigate to your Weather Activity here
-                        // val intent = Intent(this@LoginActivity, WeatherActivity::class.java)
-                        // startActivity(intent)
+
+                        finish()
                     } else {
                         Toast.makeText(this@LoginActivity, "Login Failed", Toast.LENGTH_SHORT).show()
                     }

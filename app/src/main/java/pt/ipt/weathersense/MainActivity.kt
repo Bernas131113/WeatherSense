@@ -17,6 +17,8 @@ import com.android.volley.toolbox.Volley
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import org.json.JSONObject
+import android.content.Intent
+import android.view.View
 
 class MainActivity : AppCompatActivity() {
     private lateinit var button: Button
@@ -36,6 +38,15 @@ class MainActivity : AppCompatActivity() {
 
         button.setOnClickListener {
             checkLocationPermission()
+        }
+        val btnLogin = findViewById<Button>(R.id.btnGoToLogin)
+
+
+        btnLogin.setOnClickListener {
+
+            val intent = Intent(this, LoginActivity::class.java)
+
+            startActivity(intent)
         }
     }
 
@@ -120,4 +131,38 @@ class MainActivity : AppCompatActivity() {
         const val API_KEY = "c6a05c4e496df1f1ec3336054d1dbe28"
         const val LOCATION_PERMISSION_REQUEST_CODE = 100
     }
+
+    override fun onResume() {
+        super.onResume()
+
+        //checking if user is logged in
+        val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
+        val isLoggedIn = sharedPref.getBoolean("IS_LOGGED_IN", false)
+        val userEmail = sharedPref.getString("USER_EMAIL", "User")
+
+        val btnLogin = findViewById<Button>(R.id.btnGoToLogin)
+
+        //showing or hiding button based on login state
+        if (isLoggedIn) {
+            btnLogin.text = "Logout: $userEmail"
+            btnLogin.setOnClickListener {
+                //clear the session
+                sharedPref.edit().clear().apply()
+
+                Toast.makeText(this, "Logged out!", Toast.LENGTH_SHORT).show()
+
+                // run it back
+                onResume()
+            }
+
+
+        } else {
+            btnLogin.text = "Login"
+            btnLogin.setOnClickListener {
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        }
+    }
+
 }

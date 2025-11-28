@@ -6,7 +6,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
     // 10.0.2.2 é o IP especial que o emulador Android usa para aceder ao localhost do pc
     //se quiser testar no telemovel, tenho de mudar o ip para o ip do meu pc
-    private const val BASE_URL = "http://10.0.2.2:3000/"
+    //192.168.137.1
+    private const val BASE_URL = "https://weather-auth-backend-ea1b.onrender.com/"
 
     val instance: AuthApi by lazy {
         Retrofit.Builder()

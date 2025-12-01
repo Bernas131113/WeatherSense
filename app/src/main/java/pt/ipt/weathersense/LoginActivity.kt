@@ -53,8 +53,10 @@ class LoginActivity : AppCompatActivity() {
                     if (response.isSuccessful) {
                         val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
                         val editor = sharedPref.edit()
+                        val userId = response.body()?.userId
                         editor.putString("USER_EMAIL", email)
                         editor.putBoolean("IS_LOGGED_IN", true)
+                        editor.putString("USER_ID", userId)
                         editor.apply()
                         Toast.makeText(this@LoginActivity, "Login Success!", Toast.LENGTH_SHORT).show()
 

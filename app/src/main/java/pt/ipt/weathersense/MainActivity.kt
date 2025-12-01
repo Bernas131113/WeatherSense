@@ -19,7 +19,17 @@ import com.google.android.gms.location.LocationServices
 import org.json.JSONObject
 import android.content.Intent
 import android.view.View
-
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import pt.ipt.weathersense.adapters.FavoritesAdapter
+import pt.ipt.weathersense.models.AddFavoriteRequest
+import pt.ipt.weathersense.network.RetrofitClient
+import android.app.AlertDialog
+import android.widget.EditText
 class MainActivity : AppCompatActivity() {
     private lateinit var button: Button
     private lateinit var textView: TextView
@@ -48,6 +58,8 @@ class MainActivity : AppCompatActivity() {
 
             startActivity(intent)
         }
+
+        setupFavoritesGrid()
     }
 
     private fun checkLocationPermission() {
@@ -142,6 +154,11 @@ class MainActivity : AppCompatActivity() {
 
         val btnLogin = findViewById<Button>(R.id.btnGoToLogin)
 
+        val fab = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabAddCity)
+        val rvFavorites = findViewById<RecyclerView>(R.id.rvFavorites)
+        fab.setOnClickListener {
+            showAddCityDialog()
+        }
         //showing or hiding button based on login state
         if (isLoggedIn) {
             btnLogin.text = "Logout: $userEmail"
@@ -154,6 +171,11 @@ class MainActivity : AppCompatActivity() {
                 // run it back
                 onResume()
             }
+            fab.visibility = View.VISIBLE
+            rvFavorites.visibility = View.VISIBLE
+
+            // Carregar os dados da grelha
+            setupFavoritesGrid()
 
 
         } else {
@@ -161,6 +183,133 @@ class MainActivity : AppCompatActivity() {
             btnLogin.setOnClickListener {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
+            }
+            fab.visibility = View.GONE
+            rvFavorites.visibility = View.GONE
+        }
+
+
+
+    }
+
+    private fun setupFavoritesGrid() {
+        val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
+        val userId = sharedPref.getString("USER_ID", null)
+
+        if (userId != null) {
+            // User is logged in, fetch data
+            fetchFavorites(userId)
+        } else {
+            // User is logged out, clear the grid (optional)
+        }
+    }
+
+    private fun fetchFavorites(userId: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitClient.instance.getFavorites(userId)
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful && response.body() != null) {
+                        val cities = response.body()!!.favorites
+                        val rvFavorites = findViewById<RecyclerView>(R.id.rvFavorites)
+
+                        rvFavorites.layoutManager = GridLayoutManager(this@MainActivity, 3)
+
+
+                        rvFavorites.adapter = FavoritesAdapter(
+                            cities,
+                            onCityClick = { clickedCityName ->
+                                // 1. Ver Tempo
+                                Toast.makeText(this@MainActivity, "Loading $clickedCityName...", Toast.LENGTH_SHORT).show()
+                                val weatherUrl = "https://api.openweathermap.org/data/2.5/weather?q=$clickedCityName&units=metric&appid=$API_KEY"
+                                fetchWeatherData(weatherUrl)
+                            },
+                            onDeleteClick = { cityToDelete ->
+                                // 2. Apagar Cidade (Abre um popup de confirmação opcional ou apaga direto)
+                                deleteFavoriteCity(userId, cityToDelete)
+                            }
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+    }
+    private fun testAddFavorite(userId: String, city: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            RetrofitClient.instance.addFavorite(AddFavoriteRequest(userId, city))
+            // After adding, refresh the list
+            fetchFavorites(userId)
+        }
+    }
+
+    private fun showAddCityDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Add Favorite City")
+
+        // Set up the input
+        val input = EditText(this)
+        input.hint = "Enter city name (e.g. Tokyo)"
+        builder.setView(input)
+
+        // Set up the buttons
+        builder.setPositiveButton("Add") { dialog, which ->
+            val cityName = input.text.toString()
+            if (cityName.isNotEmpty()) {
+                // Get User ID
+                val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
+                val userId = sharedPref.getString("USER_ID", null)
+
+                if (userId != null) {
+                    saveCityToBackend(userId, cityName)
+                } else {
+                    Toast.makeText(this, "Please login first!", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+        builder.setNegativeButton("Cancel") { dialog, which -> dialog.cancel() }
+
+        builder.show()
+    }
+
+    private fun saveCityToBackend(userId: String, cityName: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitClient.instance.addFavorite(AddFavoriteRequest(userId, cityName))
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@MainActivity, "$cityName added!", Toast.LENGTH_SHORT).show()
+                        // refresh grid
+                        fetchFavorites(userId)
+                    } else {
+                        Toast.makeText(this@MainActivity, "Error adding city", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+    private fun deleteFavoriteCity(userId: String, cityName: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Reutilizamos AddFavoriteRequest pq os dados são os mesmos (ID e Cidade)
+                val response = RetrofitClient.instance.removeFavorite(AddFavoriteRequest(userId, cityName))
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@MainActivity, "$cityName removed!", Toast.LENGTH_SHORT).show()
+                        // Atualiza a grelha
+                        fetchFavorites(userId)
+                    } else {
+                        Toast.makeText(this@MainActivity, "Error removing city", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

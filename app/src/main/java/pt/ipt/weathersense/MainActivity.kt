@@ -22,7 +22,11 @@ import android.view.View
 
 class MainActivity : AppCompatActivity() {
     private lateinit var button: Button
-    private lateinit var textView: TextView
+
+    private lateinit var tvTemperature: TextView
+    private lateinit var tvDescription: TextView
+    private lateinit var tvFeelsLike: TextView
+    private lateinit var tvWind: TextView
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +34,11 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        textView = findViewById(R.id.textView)
+        tvTemperature = findViewById(R.id.tvTemperature)
+        tvDescription = findViewById(R.id.tvDescription)
+        tvFeelsLike = findViewById(R.id.tvFeelsLike)
+        tvWind = findViewById(R.id.tvWind)
+
         button = findViewById(R.id.button)
 
         // Initialize location provider
@@ -93,7 +101,7 @@ class MainActivity : AppCompatActivity() {
 
                     fetchWeatherData(weatherUrl)
                 } else {
-                    textView.text = "Could not get location."
+                    tvTemperature.text = "Could not get location."
                 }
             }
             .addOnFailureListener {
@@ -108,25 +116,42 @@ class MainActivity : AppCompatActivity() {
             { response ->
                 try {
                     val jsonResponse = JSONObject(response)
+
                     val main = jsonResponse.getJSONObject("main")
-                    val temperature = main.getString("temp")
+                    val temp = main.getString("temp")
+                    val feelsLike = main.getString("feels_like")
+
                     val city = jsonResponse.getString("name")
 
-                    // Update UI with fetched data
-                    textView.text = "$temperature°C in $city"
+                    val windObj = jsonResponse.getJSONObject("wind")
+                    val windSpeed = windObj.getString("speed")
+
+                    val weatherArray = jsonResponse.getJSONArray("weather")
+                    val weatherObj = weatherArray.getJSONObject(0)
+                    val description = weatherObj.getString("description")
+
+                    // --- USAR AS VARIÁVEIS GLOBAIS ---
+                    tvTemperature.text = "${temp}°C em $city"
+
+                    // Colocar primeira letra maiúscula
+                    tvDescription.text = description.replaceFirstChar { it.uppercase() }
+
+                    tvFeelsLike.text = "Sensação: ${feelsLike}°C"
+                    tvWind.text = "Vento: ${windSpeed} m/s"
+
                 } catch (e: Exception) {
-                    textView.text = "Error parsing data!"
+                    // Podes usar o tvDescription para mostrar erro se quiseres
+                    tvDescription.text = "Erro ao ler dados"
                     e.printStackTrace()
                 }
             },
             { error ->
-                textView.text = "Error fetching weather!"
+                tvDescription.text = "Erro de ligação!"
                 error.printStackTrace()
             })
 
         queue.add(request)
     }
-
     companion object {
         const val API_KEY = "c6a05c4e496df1f1ec3336054d1dbe28"
         const val LOCATION_PERMISSION_REQUEST_CODE = 100

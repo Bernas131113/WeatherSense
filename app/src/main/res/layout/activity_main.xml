@@ -9,19 +9,57 @@
     android:background="@color/black">
 
 
+    <!-- Temperatura Principal -->
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tvTemperature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:maxLines="3"
-        android:text="Get temperature here"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="24sp"
+        android:text="--°C"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/tvDescription"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.4"
+        android:layout_marginTop="100dp"/>
+
+    <!-- Descrição (ex: Céu limpo) -->
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Estado do tempo"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/layoutDetails"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTemperature" />
+
+    <!-- Detalhes Extra (Vento e Sensação) -->
+    <LinearLayout
+        android:id="@+id/layoutDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDescription">
+
+        <TextView
+            android:id="@+id/tvFeelsLike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sensação: --°C"
+            android:paddingEnd="16dp" />
+
+        <TextView
+            android:id="@+id/tvWind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vento: -- m/s" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/button"
@@ -34,7 +72,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/layoutDetails"
         app:layout_constraintVertical_bias="0.6"
         />
     <Button

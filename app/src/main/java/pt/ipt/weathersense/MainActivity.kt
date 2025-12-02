@@ -214,7 +214,7 @@ class MainActivity : AppCompatActivity() {
                         val cities = response.body()!!.favorites
                         val rvFavorites = findViewById<RecyclerView>(R.id.rvFavorites)
 
-                        rvFavorites.layoutManager = GridLayoutManager(this@MainActivity, 3)
+                        rvFavorites.layoutManager = GridLayoutManager(this@MainActivity, 1)
 
 
                         rvFavorites.adapter = FavoritesAdapter(

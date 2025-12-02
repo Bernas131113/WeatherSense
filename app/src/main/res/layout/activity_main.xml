@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="--°C"
-        android:textSize="40sp"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/tvDescription"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,7 +45,8 @@
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDescription">
+        app:layout_constraintTop_toBottomOf="@+id/tvDescription"
+        app:layout_constraintBottom_toTopOf="@id/rvFavorites">
 
         <TextView
             android:id="@+id/tvFeelsLike"
@@ -83,7 +84,7 @@
         android:layout_marginBottom="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/layoutDetails"
         app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -100,10 +101,10 @@
         app:iconTint="@color/black"
         app:iconPadding="8dp"
         android:padding="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutDetails"
+        app:layout_constraintBottom_toTopOf="@id/btnGoToLogin"
+        android:layout_marginBottom="20dp"
         app:layout_constraintVertical_bias="0.6"
         />
     <Button
@@ -122,9 +123,10 @@
         app:icon="@drawable/icon_account"
         app:iconTint="@color/black"
         app:iconPadding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/button"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="100dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddCity"

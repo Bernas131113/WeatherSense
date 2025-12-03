@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvDescription: TextView
     private lateinit var tvFeelsLike: TextView
     private lateinit var tvWind: TextView
+    private lateinit var tvUserEmail: TextView
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
         tvDescription = findViewById(R.id.tvDescription)
         tvFeelsLike = findViewById(R.id.tvFeelsLike)
         tvWind = findViewById(R.id.tvWind)
+        tvUserEmail = findViewById(R.id.tvUserEmail)
 
         button = findViewById(R.id.button)
 
@@ -186,7 +188,11 @@ class MainActivity : AppCompatActivity() {
         }
         //showing or hiding button based on login state
         if (isLoggedIn) {
-            btnLogin.text = "Logout: $userEmail"
+            btnLogin.text = "Logout"
+
+            tvUserEmail.text = "$userEmail" // Podes personalizar a mensagem
+            tvUserEmail.visibility = View.VISIBLE
+
             btnLogin.setOnClickListener {
                 //clear the session
                 sharedPref.edit().clear().apply()
@@ -205,6 +211,7 @@ class MainActivity : AppCompatActivity() {
 
         } else {
             btnLogin.text = "Login"
+            tvUserEmail.visibility = View.GONE
             btnLogin.setOnClickListener {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
@@ -251,8 +258,16 @@ class MainActivity : AppCompatActivity() {
                                 fetchWeatherData(weatherUrl)
                             },
                             onDeleteClick = { cityToDelete ->
-                                // 2. Apagar Cidade (Abre um popup de confirmação opcional ou apaga direto)
-                                deleteFavoriteCity(userId, cityToDelete)
+
+                                AlertDialog.Builder(this@MainActivity)
+                                    .setTitle("Remover Cidade")
+                                    .setMessage("Tens a certeza que queres remover $cityToDelete?")
+                                    .setPositiveButton("Sim") { _, _ ->
+                                        // se o sim for clicado, chama a função de apagar
+                                        deleteFavoriteCity(userId, cityToDelete)
+                                    }
+                                    .setNegativeButton("Não", null)
+                                    .show()
                             }
                         )
                     }

@@ -9,6 +9,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import pt.ipt.weathersense.R
 
+import android.app.AlertDialog
+import android.widget.Toast
+
 class FavoritesAdapter(private val cityList: List<String>,
                        private val onCityClick: (String) -> Unit,
                        private val onDeleteClick: (String) -> Unit) :

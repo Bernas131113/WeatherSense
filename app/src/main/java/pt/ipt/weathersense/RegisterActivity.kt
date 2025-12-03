@@ -13,63 +13,50 @@ import kotlinx.coroutines.withContext
 import pt.ipt.weathersense.models.AuthRequest
 import pt.ipt.weathersense.network.RetrofitClient
 
-
-
-
-
-class LoginActivity : AppCompatActivity() {
+class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.activity_register)
 
         val emailInput = findViewById<EditText>(R.id.etEmail)
         val passInput = findViewById<EditText>(R.id.etPassword)
-        val btnLogin = findViewById<Button>(R.id.btnLogin)
         val btnRegister = findViewById<Button>(R.id.btnRegister)
+        val btnBackToLogin = findViewById<Button>(R.id.btnBackToLogin)
 
-        btnLogin.setOnClickListener {
+        btnRegister.setOnClickListener {
             val email = emailInput.text.toString()
             val password = passInput.text.toString()
             if(email.isNotEmpty() && password.isNotEmpty()) {
-                loginUser(email, password)
+                registerUser(email, password)
             } else {
                 Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
             }
         }
-
-        btnRegister.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+        btnBackToLogin.setOnClickListener {
+            finish()
         }
     }
 
-    private fun loginUser(email: String, pass: String) {
+    private fun registerUser(email: String, pass: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = RetrofitClient.instance.login(AuthRequest(email, pass))
+                // Chama a API de Registo
+                val response = RetrofitClient.instance.register(AuthRequest(email, pass))
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
-                        val editor = sharedPref.edit()
-                        val userId = response.body()?.userId
-                        editor.putString("USER_EMAIL", email)
-                        editor.putBoolean("IS_LOGGED_IN", true)
-                        editor.putString("USER_ID", userId) //guarda o USER_ID
-                        editor.apply()
-                        Toast.makeText(this@LoginActivity, "Login Success!", Toast.LENGTH_SHORT).show()
-
+                        Toast.makeText(this@RegisterActivity, "Registration Successful! Please Login.", Toast.LENGTH_LONG).show()
+                        // Volta para a tela de Login após o sucesso
                         finish()
                     } else {
-                        Toast.makeText(this@LoginActivity, "Login Failed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@RegisterActivity, "Registration Failed. Email may already be in use.", Toast.LENGTH_LONG).show()
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@LoginActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@RegisterActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
-
 }

@@ -31,10 +31,18 @@ class LoginActivity : AppCompatActivity() {
         btnLogin.setOnClickListener {
             val email = emailInput.text.toString()
             val password = passInput.text.toString()
+
             if(email.isNotEmpty() && password.isNotEmpty()) {
+                // 1. AVISAR QUE ESTÁ A TENTAR
+                Toast.makeText(this, "A conectar ao servidor...", Toast.LENGTH_SHORT).show()
+
+                // 2. Desativar botão para não clicar 2 vezes
+                btnLogin.isEnabled = false
+                btnLogin.text = "A carregar..."
+
                 loginUser(email, password)
             } else {
-                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Preenche os campos todos!", Toast.LENGTH_SHORT).show()
             }
         }
 

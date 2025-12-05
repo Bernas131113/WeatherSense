@@ -30,15 +30,26 @@ import pt.ipt.weathersense.models.AddFavoriteRequest
 import pt.ipt.weathersense.network.RetrofitClient
 import android.app.AlertDialog
 import android.widget.EditText
+import android.widget.ImageView
+import com.bumptech.glide.Glide
+import java.util.Calendar
+import java.util.TimeZone
+import java.text.SimpleDateFormat
+import java.util.Locale
+import androidx.recyclerview.widget.LinearLayoutManager
+import pt.ipt.weathersense.adapters.ForecastAdapter
+import pt.ipt.weathersense.models.ForecastItem
+import java.util.Date
 class MainActivity : AppCompatActivity() {
     private lateinit var button: Button
-
     private lateinit var tvTemperature: TextView
-    private lateinit var tvDescription: TextView
     private lateinit var tvFeelsLike: TextView
     private lateinit var tvWind: TextView
     private lateinit var tvUserEmail: TextView
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var ivWeatherIcon: ImageView
+    private lateinit var tvLocalTime: TextView
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,10 +57,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         tvTemperature = findViewById(R.id.tvTemperature)
-        tvDescription = findViewById(R.id.tvDescription)
         tvFeelsLike = findViewById(R.id.tvFeelsLike)
         tvWind = findViewById(R.id.tvWind)
         tvUserEmail = findViewById(R.id.tvUserEmail)
+        ivWeatherIcon = findViewById(R.id.ivWeatherIcon)
+        tvLocalTime = findViewById(R.id.tvLocalTime)
 
         button = findViewById(R.id.button)
 
@@ -114,6 +126,7 @@ class MainActivity : AppCompatActivity() {
                     println("Weather API URL: $weatherUrl")
 
                     fetchWeatherData(weatherUrl)
+
                 } else {
                     tvTemperature.text = "Could not get location."
                 }
@@ -142,25 +155,54 @@ class MainActivity : AppCompatActivity() {
 
                     val weatherArray = jsonResponse.getJSONArray("weather")
                     val weatherObj = weatherArray.getJSONObject(0)
-                    val description = weatherObj.getString("description")
+                    val iconCode = weatherObj.getString("icon")
 
-                    // --- USAR AS VARIÁVEIS GLOBAIS ---
+                    // Calcular horas
+                    // Obter o "shift" em segundos (ex: 3600)
+                    val timezoneOffset = jsonResponse.getLong("timezone")
+                    // Obter a hora atual em UTC
+                    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                    // Somar o desvio da cidade
+                    calendar.add(Calendar.SECOND, timezoneOffset.toInt())
+
+
+
+                    // Construir o URL da imagem (4x para ficar com melhor qualidade)
+                    val iconUrl = "https://openweathermap.org/img/wn/$iconCode@4x.png"
+
+                    // Formatar as horas
+                    val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+                    // Garantir que não soma o fuso do telemóvel
+                    sdf.timeZone = TimeZone.getTimeZone("UTC")
+                    val localTime = sdf.format(calendar.time)
+
+
+                    // Usar as variaveis globais
                     tvTemperature.text = "${temp}°C em $city"
-
-                    // Colocar primeira letra maiúscula
-                    tvDescription.text = description.replaceFirstChar { it.uppercase() }
-
                     tvFeelsLike.text = "Sensação: ${feelsLike}°C"
                     tvWind.text = "Vento: ${windSpeed} m/s"
+                    tvLocalTime.text = localTime
+
+                    // Carregar a imagem com o Glide
+                    Glide.with(this)
+                        .load(iconUrl)
+                        .into(ivWeatherIcon)
+
+                    val coord = jsonResponse.getJSONObject("coord")
+                    val lat = coord.getDouble("lat")
+                    val lon = coord.getDouble("lon")
+
+
+                    fetchForecast(lat,lon)
 
                 } catch (e: Exception) {
                     // Podes usar o tvDescription para mostrar erro se quiseres
-                    tvDescription.text = "Erro ao ler dados"
+                    tvTemperature.text = "Erro ao ler dados"
                     e.printStackTrace()
                 }
             },
             { error ->
-                tvDescription.text = "Erro de ligação!"
+                tvTemperature.text = "Erro de ligação!"
                 error.printStackTrace()
             })
 
@@ -169,6 +211,71 @@ class MainActivity : AppCompatActivity() {
     companion object {
         const val API_KEY = "c6a05c4e496df1f1ec3336054d1dbe28"
         const val LOCATION_PERMISSION_REQUEST_CODE = 100
+    }
+
+    private fun fetchForecast(latitude: Double, longitude: Double) {
+        val url = "https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$longitude&units=metric&appid=$API_KEY"
+
+        val request = StringRequest(Request.Method.GET, url,
+            { response ->
+                try {
+                    val jsonResponse = JSONObject(response)
+
+                    // Obter o desvio de fuso horário da cidade (em segundos)
+                    val cityObj = jsonResponse.getJSONObject("city")
+                    val timezoneOffset = cityObj.getLong("timezone")
+
+                    val list = jsonResponse.getJSONArray("list")
+                    val forecastItems = ArrayList<ForecastItem>()
+
+                    val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                    val dayFormat = SimpleDateFormat("EEE", Locale.getDefault()) // Ex: "Seg"
+
+                    for (i in 0 until list.length()) {
+                        val itemObj = list.getJSONObject(i)
+
+                        // Obter o timestamp UTC da previsão (segundos)
+                        val dt = itemObj.getLong("dt")
+
+                        // Calcular a hora LOCAL nessa cidade (0-23)
+                        // (dt + timezone) dá-nos a hora local em segundos Unix.
+                        // Dividimos por 3600 para ter horas totais, e % 24 para ter a hora do dia.
+                        val localHour = ((dt + timezoneOffset) / 3600) % 24
+
+
+                        // Escolher previsões que sejam entre as 11h e as 13h locais.
+                        // Como os dados vêm de 3 em 3 horas (ex: 10, 13, 16 ou 11, 14, 17),
+                        // este intervalo garante que apanhamos sempre o "meio-dia" local.
+                        if (localHour in 11..13) {
+
+                            val main = itemObj.getJSONObject("main")
+                            val temp = main.getDouble("temp").toInt().toString() + "°C"
+
+                            val weatherArray = itemObj.getJSONArray("weather")
+                            val icon = weatherArray.getJSONObject(0).getString("icon")
+
+                            // Formatar data para obter o dia da semana
+                            val dtTxt = itemObj.getString("dt_txt")
+                            val date = inputFormat.parse(dtTxt)
+                            val dayName = dayFormat.format(date!!)
+
+                            forecastItems.add(ForecastItem(dayName, temp, icon))
+                        }
+                    }
+
+                    val rvForecast = findViewById<RecyclerView>(R.id.rvForecast)
+                    rvForecast.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+                    rvForecast.adapter = ForecastAdapter(forecastItems)
+
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            },
+            { error ->
+                error.printStackTrace()
+            })
+
+        Volley.newRequestQueue(this).add(request)
     }
 
     override fun onResume() {

@@ -9,6 +9,7 @@
     android:background="@color/black">
 
 
+
     <TextView
         android:id="@+id/tvUserEmail"
         android:layout_width="wrap_content"
@@ -24,29 +25,43 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <ImageView
+        android:id="@+id/ivWeatherIcon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="Weather Icon"
+        app:layout_constraintBottom_toTopOf="@+id/tvTemperature"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvUserEmail"
+        app:layout_constraintVertical_bias="0.8" />
+
     <!-- Temperatura Principal -->
     <TextView
         android:id="@+id/tvTemperature"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="--°C"
         android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/tvDescription"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ivWeatherIcon"
         app:layout_constraintVertical_bias="0.4"
-        android:layout_marginTop="100dp"/>
+        android:layout_marginTop="10dp"
+        android:layout_marginHorizontal="20dp"/>
 
-    <!-- Descrição (ex: Céu limpo) -->
+    <!-- Horas no local -->
     <TextView
-        android:id="@+id/tvDescription"
+        android:id="@+id/tvLocalTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Estado do tempo"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/layoutDetails"
+        android:text="--:--"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTemperature" />
@@ -60,7 +75,7 @@
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDescription"
+        app:layout_constraintTop_toBottomOf="@+id/tvLocalTime"
         app:layout_constraintBottom_toTopOf="@id/rvFavorites">
 
         <TextView
@@ -141,7 +156,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="100dp"/>
+        android:layout_marginBottom="50dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddCity"
@@ -153,4 +168,16 @@
         android:contentDescription="Add City"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvForecast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

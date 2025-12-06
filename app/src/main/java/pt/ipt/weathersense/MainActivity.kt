@@ -49,6 +49,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var ivWeatherIcon: ImageView
     private lateinit var tvLocalTime: TextView
+    private lateinit var tvCity: TextView
+    private lateinit var searchLocation: Button
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,16 +64,22 @@ class MainActivity : AppCompatActivity() {
         tvUserEmail = findViewById(R.id.tvUserEmail)
         ivWeatherIcon = findViewById(R.id.ivWeatherIcon)
         tvLocalTime = findViewById(R.id.tvLocalTime)
-
+        tvCity = findViewById(R.id.tvCity)
+        searchLocation = findViewById(R.id.searchLocation)
         button = findViewById(R.id.button)
 
         // Initialize location provider
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        checkLocationPermission()
 
         button.setOnClickListener {
             checkLocationPermission()
         }
         val btnLogin = findViewById<Button>(R.id.btnGoToLogin)
+
+        searchLocation.setOnClickListener {
+            showSearchDialog()
+        }
 
 
         btnLogin.setOnClickListener {
@@ -145,8 +153,9 @@ class MainActivity : AppCompatActivity() {
                     val jsonResponse = JSONObject(response)
 
                     val main = jsonResponse.getJSONObject("main")
-                    val temp = main.getString("temp")
-                    val feelsLike = main.getString("feels_like")
+                    val temp = main.getDouble("temp").toInt().toString()
+                    val feelsLike = main.getDouble("feels_like").toInt().toString()
+
 
                     val city = jsonResponse.getString("name")
 
@@ -178,10 +187,11 @@ class MainActivity : AppCompatActivity() {
 
 
                     // Usar as variaveis globais
-                    tvTemperature.text = "${temp}°C em $city"
+                    tvCity.text = city
+                    tvTemperature.text = "${temp}°C "
                     tvFeelsLike.text = "Sensação: ${feelsLike}°C"
                     tvWind.text = "Vento: ${windSpeed} m/s"
-                    tvLocalTime.text = localTime
+                    tvLocalTime.text = "Hora local: ${localTime}"
 
                     // Carregar a imagem com o Glide
                     Glide.with(this)
@@ -360,7 +370,7 @@ class MainActivity : AppCompatActivity() {
                             cities,
                             onCityClick = { clickedCityName ->
                                 // 1. Ver Tempo
-                                Toast.makeText(this@MainActivity, "Loading $clickedCityName...", Toast.LENGTH_SHORT).show()
+                                //Toast.makeText(this@MainActivity, "Loading $clickedCityName...", Toast.LENGTH_SHORT).show()
                                 val weatherUrl = "https://api.openweathermap.org/data/2.5/weather?q=$clickedCityName&units=metric&appid=$API_KEY"
                                 fetchWeatherData(weatherUrl)
                             },
@@ -418,6 +428,37 @@ class MainActivity : AppCompatActivity() {
             }
         }
         builder.setNegativeButton("Cancel") { dialog, which -> dialog.cancel() }
+
+        builder.show()
+    }
+
+    private fun showSearchDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Pesquisar Localização")
+
+        // configurar o input
+        val input = EditText(this)
+        input.hint = "Introduza o nome da cidade (ex: Porto)"
+        input.inputType = android.text.InputType.TYPE_CLASS_TEXT
+        builder.setView(input)
+
+        // botões
+        builder.setPositiveButton("Pesquisar") { dialog, which ->
+            val cityName = input.text.toString().trim()
+            if (cityName.isNotEmpty()) {
+
+                // construir o URL da API para essa cidade
+                val weatherUrl = "https://api.openweathermap.org/data/2.5/weather?q=$cityName&units=metric&appid=$API_KEY"
+
+
+                // funcao que ja temos
+                fetchWeatherData(weatherUrl)
+            }
+        }
+
+        builder.setNegativeButton("Cancelar") { dialog, which ->
+            dialog.cancel()
+        }
 
         builder.show()
     }

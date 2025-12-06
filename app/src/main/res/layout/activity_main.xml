@@ -8,35 +8,71 @@
     android:background="@drawable/bg_gradient"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/tvUserEmail"
-        android:layout_width="wrap_content"
+
+    <LinearLayout
+        android:id="@+id/LoginLogoutUser"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="24dp"
-        android:text="Olá, Bernardo"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:fontFamily="sans-serif-medium"
-        android:visibility="visible"
-        app:drawableStartCompat="@android:drawable/ic_menu_my_calendar"
-        app:drawableTint="@color/white"
-        android:drawablePadding="8dp"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Olá, Bernardo" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvUserEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Olá, Bernardo"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:visibility="visible"
+            app:drawableTint="@color/white"
+            android:drawablePadding="8dp"
+            android:layout_marginStart="24dp"
+            tools:text="Olá, Bernardo"
+            app:icon="@drawable/icon_account"/>
+        <Button
+            android:id="@+id/btnGoToLogin"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:textColor="@color/white"
+            android:layout_marginEnd="24dp"
+            app:icon="@drawable/icon_account"
+            app:iconTint="@color/white"
+            android:backgroundTint="#30FFFFFF"/>
+    </LinearLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvForecast"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="20dp"
+        android:foregroundGravity="center"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/LoginLogoutUser"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardWeather"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="15dp"
         app:cardBackgroundColor="#30FFFFFF"
         app:cardCornerRadius="24dp"
         app:cardElevation="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/tvUserEmail"
+        app:layout_constraintTop_toBottomOf="@+id/rvForecast"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -47,14 +83,23 @@
             android:orientation="vertical"
             android:padding="24dp">
 
+
+            <TextView
+                android:id="@+id/tvCity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--°C"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-light"
+                tools:text="Vila Nova da Barquinha"
+                android:gravity="center"/>
         <LinearLayout
             android:id="@+id/tvTemperatureIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="16dp"
-            android:divider="?android:attr/dividerHorizontal"
-            android:showDividers="middle"
             android:dividerPadding="8dp">
             <TextView
                 android:id="@+id/tvTemperature"
@@ -62,48 +107,26 @@
                 android:layout_height="wrap_content"
                 android:text="--°C"
                 android:textColor="@color/white"
-                android:textSize="20sp"
+                android:textSize="50sp"
                 android:fontFamily="sans-serif-light"
-                tools:text="23°C" />
+                tools:text="23 °C" />
             <ImageView
                 android:id="@+id/ivWeatherIcon"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:contentDescription="Weather Icon"
                 app:layout_constraintBottom_toTopOf="@+id/tvTemperature"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tvUserEmail"
                 android:layout_marginStart="50dp"
-                app:layout_constraintVertical_bias="0.8" />
+                app:layout_constraintVertical_bias="0.8"
+                tools:src="@mipmap/appicon"/>
 
         </LinearLayout>
 
 
-            <TextView
-                android:id="@+id/tvLocalTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="--:--"
-                android:textSize="36sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:layout_marginTop="0dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvTemperature" />
 
-            <TextView
-                android:id="@+id/tvDescription"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Estado do tempo"
-                android:textAllCaps="true"
-                android:textColor="#E0E0E0"
-                android:textSize="18sp"
-                android:letterSpacing="0.1"
-                android:layout_marginTop="4dp"
-                tools:text="CÉU LIMPO" />
 
             <LinearLayout
                 android:id="@+id/layoutDetails"
@@ -111,25 +134,37 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="16dp"
-                android:divider="?android:attr/dividerHorizontal"
-                android:showDividers="middle"
-                android:dividerPadding="8dp">
+                >
+
+
+                <TextView
+                    android:id="@+id/tvLocalTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hora local: --:--"
+                    android:textSize="13sp"
+                    android:textColor="@color/white"
+                    android:layout_marginTop="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvTemperature" />
 
                 <TextView
                     android:id="@+id/tvFeelsLike"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sensação: --°C"
-                    android:textColor="#E0E0E0"
-                    android:textSize="14sp"
-                    android:layout_marginEnd="16dp" />
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:layout_marginEnd="14dp"
+                    android:layout_marginStart="14dp"/>
 
                 <TextView
                     android:id="@+id/tvWind"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="#E0E0E0"
-                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
                     android:text="Vento: -- m/s" />
             </LinearLayout>
         </LinearLayout>
@@ -147,8 +182,7 @@
         android:textColor="@color/white"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardWeather"/>
@@ -172,27 +206,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="20dp"
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent">
 
+
         <Button
-            android:id="@+id/btnGoToLogin"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:id="@+id/searchLocation"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Login"
-            android:textColor="@color/white"
-            android:layout_marginEnd="16dp"
-            app:icon="@drawable/icon_account"
-            app:iconTint="@color/white"/>
-
+            android:backgroundTint="@color/white"
+            android:text="Pesquisar"
+            android:textColor="#1565C0"
+            app:icon="@drawable/icon_search"
+            android:layout_marginEnd="10dp"
+            app:iconTint="#1565C0"
+            app:cornerRadius="20dp"
+            android:textSize="14sp"
+            android:elevation="4dp"/>
         <Button
             android:id="@+id/button"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/white"
+            android:textSize="14sp"
             android:text="Localização Atual"
             android:textColor="#1565C0"
             app:icon="@drawable/icon_location"
@@ -213,15 +252,6 @@
         android:contentDescription="Add City"
         app:layout_constraintBottom_toTopOf="@+id/layoutButtons"
         app:layout_constraintEnd_toEndOf="parent" />
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvForecast"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

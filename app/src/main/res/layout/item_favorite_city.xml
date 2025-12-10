@@ -35,20 +35,10 @@
             android:fontFamily="sans-serif-medium"
             android:textColor="#37474F"
             app:layout_constraintStart_toEndOf="@id/ivIcon"
-            app:layout_constraintEnd_toStartOf="@+id/btnDelete"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-        <ImageButton
-            android:id="@+id/btnDelete"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_delete"
-            app:tint="#D32F2F"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

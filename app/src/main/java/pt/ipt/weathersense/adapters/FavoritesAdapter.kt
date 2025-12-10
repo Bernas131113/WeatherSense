@@ -13,13 +13,11 @@ import android.app.AlertDialog
 import android.widget.Toast
 
 class FavoritesAdapter(private val cityList: List<String>,
-                       private val onCityClick: (String) -> Unit,
-                       private val onDeleteClick: (String) -> Unit) :
+                       private val onCityClick: (String) -> Unit) :
     RecyclerView.Adapter<FavoritesAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvCityName: TextView = view.findViewById(R.id.tvCityName)
-        val btnDelete: ImageButton = view.findViewById(R.id.btnDelete)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,9 +33,7 @@ class FavoritesAdapter(private val cityList: List<String>,
         holder.itemView.setOnClickListener {
             onCityClick(city) // Pass the city name back to MainActivity
         }
-        holder.btnDelete.setOnClickListener {
-            onDeleteClick(city)
-        }
+
     }
 
     override fun getItemCount() = cityList.size

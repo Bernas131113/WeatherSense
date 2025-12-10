@@ -56,6 +56,8 @@ class MainActivity : AppCompatActivity() {
     private var isCardExpanded = true
     private lateinit var groupCardContent: androidx.constraintlayout.widget.Group
     private lateinit var btnToggleCard: ImageButton
+    private lateinit var btnFavAction: Button
+    private var favoriteCitiesList: MutableList<String> = ArrayList()
 
 
 
@@ -75,6 +77,7 @@ class MainActivity : AppCompatActivity() {
         button = findViewById(R.id.button)
         groupCardContent = findViewById(R.id.groupCardContent)
         btnToggleCard = findViewById(R.id.btnToggleCard)
+        btnFavAction = findViewById(R.id.btnFavAction)
 
 
         // Initialize location provider
@@ -211,6 +214,8 @@ class MainActivity : AppCompatActivity() {
                         .load(iconUrl)
                         .into(ivWeatherIcon)
 
+                    updateFavoriteButtonState(city)
+
                     val coord = jsonResponse.getJSONObject("coord")
                     val lat = coord.getDouble("lat")
                     val lon = coord.getDouble("lon")
@@ -311,11 +316,8 @@ class MainActivity : AppCompatActivity() {
 
         val btnLogin = findViewById<Button>(R.id.btnGoToLogin)
 
-        val fab = findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabAddCity)
         val rvFavorites = findViewById<RecyclerView>(R.id.rvFavorites)
-        fab.setOnClickListener {
-            showAddCityDialog()
-        }
+
         //showing or hiding button based on login state
         if (isLoggedIn) {
             btnLogin.text = "Logout"
@@ -328,11 +330,11 @@ class MainActivity : AppCompatActivity() {
                 sharedPref.edit().clear().apply()
 
                 Toast.makeText(this, "Logged out!", Toast.LENGTH_SHORT).show()
-
+                favoriteCitiesList.clear()
                 // run it back
                 onResume()
             }
-            fab.visibility = View.VISIBLE
+
             rvFavorites.visibility = View.VISIBLE
 
             // Carregar os dados da grelha
@@ -342,11 +344,13 @@ class MainActivity : AppCompatActivity() {
         } else {
             btnLogin.text = "Login"
             tvUserEmail.visibility = View.GONE
+            btnFavAction.visibility = View.GONE
+
             btnLogin.setOnClickListener {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
             }
-            fab.visibility = View.GONE
+
             rvFavorites.visibility = View.GONE
         }
 
@@ -374,11 +378,10 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful && response.body() != null) {
                         val cities = response.body()!!.favorites
+                        favoriteCitiesList = cities.toMutableList()
                         val rvFavorites = findViewById<RecyclerView>(R.id.rvFavorites)
 
                         rvFavorites.layoutManager = GridLayoutManager(this@MainActivity, 1)
-
-
                         rvFavorites.adapter = FavoritesAdapter(
                             cities,
                             onCityClick = { clickedCityName ->
@@ -387,18 +390,7 @@ class MainActivity : AppCompatActivity() {
                                 val weatherUrl = "https://api.openweathermap.org/data/2.5/weather?q=$clickedCityName&units=metric&appid=$API_KEY"
                                 fetchWeatherData(weatherUrl)
                             },
-                            onDeleteClick = { cityToDelete ->
 
-                                AlertDialog.Builder(this@MainActivity)
-                                    .setTitle("Remover Cidade")
-                                    .setMessage("Tens a certeza que queres remover $cityToDelete?")
-                                    .setPositiveButton("Sim") { _, _ ->
-                                        // se o sim for clicado, chama a função de apagar
-                                        deleteFavoriteCity(userId, cityToDelete)
-                                    }
-                                    .setNegativeButton("Não", null)
-                                    .show()
-                            }
                         )
                     }
                 }
@@ -485,6 +477,8 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(this@MainActivity, "$cityName added!", Toast.LENGTH_SHORT).show()
                         // refresh grid
                         fetchFavorites(userId)
+                        favoriteCitiesList.add(cityName)
+                        updateFavoriteButtonState(cityName)
                     } else {
                         Toast.makeText(this@MainActivity, "Error adding city", Toast.LENGTH_SHORT).show()
                     }
@@ -505,6 +499,8 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(this@MainActivity, "$cityName removed!", Toast.LENGTH_SHORT).show()
                         // Atualiza a grelha
                         fetchFavorites(userId)
+                        favoriteCitiesList.remove(cityName)
+                        updateFavoriteButtonState(cityName)
                     } else {
                         Toast.makeText(this@MainActivity, "Error removing city", Toast.LENGTH_SHORT).show()
                     }
@@ -516,10 +512,50 @@ class MainActivity : AppCompatActivity() {
     }
     private fun toggleCardVisibility() {
         isCardExpanded = !isCardExpanded
+
         if (isCardExpanded) {
+
             groupCardContent.visibility = View.VISIBLE
+            btnToggleCard.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+            val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
+            val isLoggedIn = sharedPref.getBoolean("IS_LOGGED_IN", false)
+            if (isLoggedIn) {
+                btnFavAction.visibility = View.VISIBLE
+            } else {
+                btnFavAction.visibility = View.GONE
+            }
         } else {
             groupCardContent.visibility = View.GONE
+            btnFavAction.visibility = View.GONE
+            btnToggleCard.setImageResource(android.R.drawable.ic_input_add)
+        }
+    }
+
+    private fun updateFavoriteButtonState(currentCity: String) {
+        val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
+        val isLoggedIn = sharedPref.getBoolean("IS_LOGGED_IN", false)
+        val userId = sharedPref.getString("USER_ID", null)
+
+        if (isLoggedIn && userId != null) {
+            btnFavAction.visibility = View.VISIBLE
+            val isFavorite = favoriteCitiesList.any { it.equals(currentCity, ignoreCase = true) }
+
+            if (favoriteCitiesList.contains(currentCity)) {
+                btnFavAction.text = "Remover dos Favoritos"
+
+                btnFavAction.setOnClickListener {
+                    deleteFavoriteCity(userId, currentCity)
+                }
+            } else {
+
+                btnFavAction.text = "Adicionar aos Favoritos"
+                btnFavAction.setOnClickListener {
+                    saveCityToBackend(userId, currentCity)
+                }
+            }
+        } else {
+            // Se não tiver login, esconde o botão
+            btnFavAction.visibility = View.GONE
         }
     }
 

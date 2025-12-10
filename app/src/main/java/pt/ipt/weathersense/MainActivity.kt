@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -37,6 +38,7 @@ import java.util.TimeZone
 import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.constraintlayout.widget.Group
 import pt.ipt.weathersense.adapters.ForecastAdapter
 import pt.ipt.weathersense.models.ForecastItem
 import java.util.Date
@@ -51,6 +53,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvLocalTime: TextView
     private lateinit var tvCity: TextView
     private lateinit var searchLocation: Button
+    private var isCardExpanded = true
+    private lateinit var groupCardContent: androidx.constraintlayout.widget.Group
+    private lateinit var btnToggleCard: ImageButton
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +73,9 @@ class MainActivity : AppCompatActivity() {
         tvCity = findViewById(R.id.tvCity)
         searchLocation = findViewById(R.id.searchLocation)
         button = findViewById(R.id.button)
+        groupCardContent = findViewById(R.id.groupCardContent)
+        btnToggleCard = findViewById(R.id.btnToggleCard)
+
 
         // Initialize location provider
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -87,6 +96,10 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, LoginActivity::class.java)
 
             startActivity(intent)
+        }
+
+        btnToggleCard.setOnClickListener {
+            toggleCardVisibility()
         }
 
         setupFavoritesGrid()
@@ -499,6 +512,14 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+        }
+    }
+    private fun toggleCardVisibility() {
+        isCardExpanded = !isCardExpanded
+        if (isCardExpanded) {
+            groupCardContent.visibility = View.VISIBLE
+        } else {
+            groupCardContent.visibility = View.GONE
         }
     }
 

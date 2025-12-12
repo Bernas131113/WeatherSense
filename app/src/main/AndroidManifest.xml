@@ -17,7 +17,7 @@
         android:theme="@style/Theme.WeatherSense">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDKQ1VuUlkukxaabKaI0K1wLIa3XhS1Qzc"/>
+            android:value="${GOOGLE_MAPS_KEY}"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

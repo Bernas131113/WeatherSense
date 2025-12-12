@@ -23,9 +23,14 @@ android {
         val localPropertiesFile = project.rootProject.file("local.properties")
         if (localPropertiesFile.exists()) {
             properties.load(FileInputStream(localPropertiesFile)) }
-        val apiKey = properties.getProperty("WEATHER_API_KEY") ?: ""
 
+        val apiKey = properties.getProperty("WEATHER_API_KEY") ?: ""
         buildConfigField("String", "API_KEY", "\"$apiKey\"")
+
+        val googleMapsKey = properties.getProperty("GOOGLE_MAPS_KEY") ?: ""
+
+        // Isto envia a chave para o AndroidManifest.xml
+        manifestPlaceholders["GOOGLE_MAPS_KEY"] = googleMapsKey
     }
 
     buildTypes {

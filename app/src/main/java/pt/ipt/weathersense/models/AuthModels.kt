@@ -1,13 +1,14 @@
 package pt.ipt.weathersense.models
 
 data class AuthRequest(
-    val email: String,
+    val username: String,
     val password: String
 )
 
 data class AuthResponse(
     val message: String,
-    val userId: String?
+    val userId: String?,
+    val username: String?
 )
 
 data class AddFavoriteRequest(

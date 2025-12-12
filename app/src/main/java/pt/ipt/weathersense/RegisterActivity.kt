@@ -19,18 +19,18 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        val emailInput = findViewById<EditText>(R.id.etEmail)
+        val usernameInput = findViewById<EditText>(R.id.etUsername)
         val passInput = findViewById<EditText>(R.id.etPassword)
         val btnRegister = findViewById<Button>(R.id.btnRegister)
         val btnBackToLogin = findViewById<Button>(R.id.btnBackToLogin)
 
         btnRegister.setOnClickListener {
-            val email = emailInput.text.toString()
+            val username = usernameInput.text.toString()
             val password = passInput.text.toString()
-            if(email.isNotEmpty() && password.isNotEmpty()) {
-                registerUser(email, password)
+            if(username.isNotEmpty() && password.isNotEmpty()) {
+                registerUser(username, password)
             } else {
-                Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Por favor introduzir username e password", Toast.LENGTH_SHORT).show()
             }
         }
         btnBackToLogin.setOnClickListener {
@@ -38,11 +38,11 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    private fun registerUser(email: String, pass: String) {
+    private fun registerUser(username: String, pass: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Chama a API de Registo
-                val response = RetrofitClient.instance.register(AuthRequest(email, pass))
+                val response = RetrofitClient.instance.register(AuthRequest(username, pass))
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@RegisterActivity, "Registration Successful! Please Login.", Toast.LENGTH_LONG).show()

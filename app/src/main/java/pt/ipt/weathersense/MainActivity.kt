@@ -314,7 +314,7 @@ class MainActivity : AppCompatActivity() {
         //checking if user is logged in
         val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
         val isLoggedIn = sharedPref.getBoolean("IS_LOGGED_IN", false)
-        val userEmail = sharedPref.getString("USER_EMAIL", "User")
+        val username = sharedPref.getString("USER_NAME", "User")
 
         val btnLogin = findViewById<Button>(R.id.btnGoToLogin)
 
@@ -324,14 +324,14 @@ class MainActivity : AppCompatActivity() {
         if (isLoggedIn) {
             btnLogin.text = "Logout"
 
-            tvUserEmail.text = "$userEmail" // Podes personalizar a mensagem
+            tvUserEmail.text = "$username" // Podes personalizar a mensagem
             tvUserEmail.visibility = View.VISIBLE
 
             btnLogin.setOnClickListener {
                 //clear the session
                 sharedPref.edit().clear().apply()
 
-                Toast.makeText(this, "Logged out!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Logout concluido!", Toast.LENGTH_SHORT).show()
                 favoriteCitiesList.clear()
                 // run it back
                 onResume()
@@ -476,13 +476,13 @@ class MainActivity : AppCompatActivity() {
                 val response = RetrofitClient.instance.addFavorite(AddFavoriteRequest(userId, cityName))
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@MainActivity, "$cityName added!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "$cityName adicionado aos favoritos!", Toast.LENGTH_SHORT).show()
                         // refresh grid
                         fetchFavorites(userId)
                         favoriteCitiesList.add(cityName)
                         updateFavoriteButtonState(cityName)
                     } else {
-                        Toast.makeText(this@MainActivity, "Error adding city", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "Erro a adicionar cidade", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
@@ -498,13 +498,13 @@ class MainActivity : AppCompatActivity() {
 
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@MainActivity, "$cityName removed!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "$cityName removido dos favoritos!", Toast.LENGTH_SHORT).show()
                         // Atualiza a grelha
                         fetchFavorites(userId)
                         favoriteCitiesList.remove(cityName)
                         updateFavoriteButtonState(cityName)
                     } else {
-                        Toast.makeText(this@MainActivity, "Error removing city", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@MainActivity, "Erro a remover a cidade", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {

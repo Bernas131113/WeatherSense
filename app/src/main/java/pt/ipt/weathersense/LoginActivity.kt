@@ -23,16 +23,16 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val emailInput = findViewById<EditText>(R.id.etEmail)
+        val usernameInput = findViewById<EditText>(R.id.etUsername)
         val passInput = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
         val btnRegister = findViewById<Button>(R.id.btnRegister)
 
         btnLogin.setOnClickListener {
-            val email = emailInput.text.toString()
+            val username = usernameInput.text.toString()
             val password = passInput.text.toString()
 
-            if(email.isNotEmpty() && password.isNotEmpty()) {
+            if(username.isNotEmpty() && password.isNotEmpty()) {
                 // 1. AVISAR QUE ESTÁ A TENTAR
                 Toast.makeText(this, "A conectar ao servidor...", Toast.LENGTH_SHORT).show()
 
@@ -40,7 +40,7 @@ class LoginActivity : AppCompatActivity() {
                 btnLogin.isEnabled = false
                 btnLogin.text = "A carregar..."
 
-                loginUser(email, password)
+                loginUser(username, password)
             } else {
                 Toast.makeText(this, "Preenche os campos todos!", Toast.LENGTH_SHORT).show()
             }
@@ -52,29 +52,29 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun loginUser(email: String, pass: String) {
+    private fun loginUser(username: String, pass: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = RetrofitClient.instance.login(AuthRequest(email, pass))
+                val response = RetrofitClient.instance.login(AuthRequest(username, pass))
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
                         val editor = sharedPref.edit()
                         val userId = response.body()?.userId
-                        editor.putString("USER_EMAIL", email)
+                        editor.putString("USER_NAME", username)
                         editor.putBoolean("IS_LOGGED_IN", true)
                         editor.putString("USER_ID", userId) //guarda o USER_ID
                         editor.apply()
-                        Toast.makeText(this@LoginActivity, "Login Success!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LoginActivity, "Login com sucesso!", Toast.LENGTH_SHORT).show()
 
                         finish()
                     } else {
-                        Toast.makeText(this@LoginActivity, "Login Failed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LoginActivity, "Login falhado", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@LoginActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@LoginActivity, "Erro: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }

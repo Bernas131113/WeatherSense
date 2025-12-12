@@ -39,8 +39,10 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.constraintlayout.widget.Group
+import pt.ipt.weathersense.BuildConfig
 import pt.ipt.weathersense.adapters.ForecastAdapter
 import pt.ipt.weathersense.models.ForecastItem
+
 import java.util.Date
 class MainActivity : AppCompatActivity() {
     private lateinit var button: Button
@@ -237,7 +239,7 @@ class MainActivity : AppCompatActivity() {
         queue.add(request)
     }
     companion object {
-        const val API_KEY = "c6a05c4e496df1f1ec3336054d1dbe28"
+        val API_KEY = BuildConfig.API_KEY
         const val LOCATION_PERMISSION_REQUEST_CODE = 100
     }
 

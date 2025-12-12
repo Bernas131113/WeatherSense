@@ -39,6 +39,8 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.constraintlayout.widget.Group
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import pt.ipt.weathersense.BuildConfig
 import pt.ipt.weathersense.adapters.ForecastAdapter
 import pt.ipt.weathersense.models.ForecastItem
@@ -67,6 +69,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        val mainView = findViewById<androidx.constraintlayout.widget.ConstraintLayout>(R.id.main)
+
+        ViewCompat.setOnApplyWindowInsetsListener(mainView) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Aplica padding para evitar a barra de estado (topo) e a barra de navegação (fundo)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         tvTemperature = findViewById(R.id.tvTemperature)
         tvFeelsLike = findViewById(R.id.tvFeelsLike)

@@ -473,6 +473,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        builder.setNeutralButton("Google Maps") { dialog, which ->
+            // Abrir o mapa
+            val intent = Intent(this, MapPickerActivity::class.java)
+            mapPickerLauncher.launch(intent)
+        }
+
         builder.setNegativeButton("Cancelar") { dialog, which ->
             dialog.cancel()
         }
@@ -568,6 +574,23 @@ class MainActivity : AppCompatActivity() {
         } else {
             // Se não tiver login, esconde o botão
             btnFavAction.visibility = View.GONE
+        }
+    }
+    private val mapPickerLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            val data = result.data
+            if (data != null) {
+                val lat = data.getDoubleExtra("lat", 0.0)
+                val lon = data.getDoubleExtra("lon", 0.0)
+
+                // Construir URL com Lat/Lon (igual ao GPS)
+                val weatherUrl = "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&units=metric&appid=$API_KEY"
+
+                Toast.makeText(this, "Localização recebida do mapa!", Toast.LENGTH_SHORT).show()
+                fetchWeatherData(weatherUrl)
+            }
         }
     }
 

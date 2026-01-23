@@ -4,6 +4,7 @@ import pt.ipt.weathersense.models.AuthRequest
 import pt.ipt.weathersense.models.AuthResponse
 import pt.ipt.weathersense.models.AddFavoriteRequest
 import pt.ipt.weathersense.models.FavoritesResponse
+import pt.ipt.weathersense.models.UpdatePasswordRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -26,4 +27,6 @@ interface AuthApi {
     @POST("/remove-favorite")
     suspend fun removeFavorite(@Body request: AddFavoriteRequest): Response<AuthResponse>
 
+    @POST("/update-password")
+    suspend fun updatePassword(@Body request: UpdatePasswordRequest): Response<AuthResponse>
 }

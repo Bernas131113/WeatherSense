@@ -19,3 +19,7 @@ data class AddFavoriteRequest(
 data class FavoritesResponse(
     val favorites: List<String>
 )
+data class UpdatePasswordRequest(
+    val userId: String,
+    val newPass: String
+)

@@ -321,42 +321,49 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        //checking if user is logged in
         val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
         val isLoggedIn = sharedPref.getBoolean("IS_LOGGED_IN", false)
         val username = sharedPref.getString("USER_NAME", "User")
 
         val btnLogin = findViewById<Button>(R.id.btnGoToLogin)
-
         val rvFavorites = findViewById<RecyclerView>(R.id.rvFavorites)
 
-        //showing or hiding button based on login state
+        // --- 1. Tens esta linha aqui? ---
+        val btnChangePass = findViewById<Button>(R.id.btnChangePass)
+
         if (isLoggedIn) {
+            // ESTADO: LOGADO
             btnLogin.text = "Logout"
 
-            tvUserEmail.text = "$username" // Podes personalizar a mensagem
+            tvUserEmail.text = "Olá, $username"
             tvUserEmail.visibility = View.VISIBLE
 
-            btnLogin.setOnClickListener {
-                //clear the session
-                sharedPref.edit().clear().apply()
+            // --- 2. E este bloco aqui? ---
+            btnChangePass.visibility = View.VISIBLE
+            btnChangePass.setOnClickListener {
+                val intent = Intent(this, EditProfileActivity::class.java)
+                startActivity(intent)
+            }
+            // ---------------------------
 
-                Toast.makeText(this, "Logout concluido!", Toast.LENGTH_SHORT).show()
+            btnLogin.setOnClickListener {
+                sharedPref.edit().clear().apply()
+                Toast.makeText(this, "Logout feito!", Toast.LENGTH_SHORT).show()
                 favoriteCitiesList.clear()
-                // run it back
-                onResume()
+                onResume() // Recarrega o ecrã para esconder as coisas
             }
 
             rvFavorites.visibility = View.VISIBLE
-
-            // Carregar os dados da grelha
             setupFavoritesGrid()
 
-
         } else {
+            // ESTADO: NÃO LOGADO
             btnLogin.text = "Login"
             tvUserEmail.visibility = View.GONE
             btnFavAction.visibility = View.GONE
+
+            // --- 3. Garante que ele desaparece se não houver login ---
+            btnChangePass.visibility = View.GONE
 
             btnLogin.setOnClickListener {
                 val intent = Intent(this, LoginActivity::class.java)
@@ -365,9 +372,6 @@ class MainActivity : AppCompatActivity() {
 
             rvFavorites.visibility = View.GONE
         }
-
-
-
     }
 
     private fun setupFavoritesGrid() {

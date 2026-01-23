@@ -9,7 +9,6 @@
     android:background="@drawable/bg_gradient"
     tools:context=".MainActivity">
 
-
     <LinearLayout
         android:id="@+id/LoginLogoutUser"
         android:layout_width="0dp"
@@ -23,7 +22,7 @@
 
         <TextView
             android:id="@+id/tvUserEmail"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Olá, Bernardo"
@@ -37,6 +36,20 @@
             android:layout_marginStart="24dp"
             tools:text="Olá, Bernardo"
             app:icon="@drawable/icon_account"/>
+
+        <Button
+            android:id="@+id/btnChangePass"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Password"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            android:layout_marginEnd="4dp"
+            app:icon="@android:drawable/ic_lock_idle_lock"
+            app:iconTint="@color/white"
+            android:backgroundTint="#30FFFFFF"/>
+
         <Button
             android:id="@+id/btnGoToLogin"
             style="@style/Widget.MaterialComponents.Button.TextButton"
@@ -50,6 +63,22 @@
             android:backgroundTint="#30FFFFFF"/>
     </LinearLayout>
 
+    <Button
+        android:id="@+id/btnChangePass"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:text="Mudar Password"
+        android:textSize="11sp"
+        android:textColor="@color/white"
+        android:backgroundTint="#FF9800"
+        android:visibility="gone"
+        android:layout_marginEnd="24dp"
+        android:paddingVertical="0dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/LoginLogoutUser"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:cornerRadius="8dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvForecast"
@@ -57,9 +86,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginBottom="16dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="4dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintTop_toBottomOf="@id/LoginLogoutUser"
+        app:layout_constraintTop_toBottomOf="@id/btnChangePass"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -68,7 +97,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         app:cardBackgroundColor="#30FFFFFF"
         app:cardCornerRadius="24dp"
         app:cardElevation="0dp"
@@ -169,6 +198,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:text="Vento: -- m/s" />
+
             </LinearLayout>
 
             <Button
@@ -196,11 +226,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
-
-
-
-
-
 
     <TextView
         android:id="@+id/tvFavTitle"
@@ -242,7 +267,6 @@
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent">
 
-
         <Button
             android:id="@+id/searchLocation"
             style="@style/Widget.MaterialComponents.Button"
@@ -272,8 +296,5 @@
             app:cornerRadius="20dp"
             android:elevation="4dp"/>
     </LinearLayout>
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

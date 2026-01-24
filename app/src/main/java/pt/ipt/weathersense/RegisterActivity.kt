@@ -30,7 +30,7 @@ class RegisterActivity : AppCompatActivity() {
             if(username.isNotEmpty() && password.isNotEmpty()) {
                 registerUser(username, password)
             } else {
-                Toast.makeText(this, "Por favor introduzir username e password", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Por favor introduzir Nome de Utilizador e Palavra-Passe", Toast.LENGTH_SHORT).show()
             }
         }
         btnBackToLogin.setOnClickListener {
@@ -45,16 +45,16 @@ class RegisterActivity : AppCompatActivity() {
                 val response = RetrofitClient.instance.register(AuthRequest(username, pass))
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
-                        Toast.makeText(this@RegisterActivity, "Registration Successful! Please Login.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@RegisterActivity, "Registro com Sucesso. Realize o Login", Toast.LENGTH_LONG).show()
                         // Volta para a tela de Login após o sucesso
                         finish()
                     } else {
-                        Toast.makeText(this@RegisterActivity, "Registration Failed. Email may already be in use.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@RegisterActivity, "Registro falhado.", Toast.LENGTH_LONG).show()
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@RegisterActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@RegisterActivity, "Erro: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }

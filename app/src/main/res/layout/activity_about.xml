@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/btnBack"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:text="Voltar"
+            android:textColor="@color/white"
+            app:icon="@android:drawable/ic_menu_revert"
+            app:iconTint="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desenvolvimento de Aplicações Móveis"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Licenciatura em Eng. Informática\nAno Letivo 2025/2026"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginTop="8dp"/>
+
+        <View
+            android:layout_width="100dp"
+            android:layout_height="2dp"
+            android:background="#80FFFFFF"
+            android:layout_marginVertical="24dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Autores"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#30FFFFFF"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@mipmap/bernardo_alves"
+                android:layout_marginEnd="16dp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bernardo Alves"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textSize="18sp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nº 26548"
+                    android:textColor="@color/white"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="#30FFFFFF"
+            android:padding="12dp"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@mipmap/bruno_garcia"
+                android:layout_marginEnd="16dp"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Bruno Garcia"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:textSize="18sp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nº 25941"
+                    android:textColor="@color/white"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bibliotecas &amp; Créditos"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Retrofit &amp; Gson (Networking)\n• Volley (Image &amp; JSON)\n• Glide (Image Loading)\n• Google Maps SDK\n• Google Play Services (Location)"
+            android:textColor="@color/white"
+            android:lineSpacingExtra="4dp"
+            android:textSize="14sp"
+            android:background="#30FFFFFF"
+            android:padding="12dp"/>
+
+    </LinearLayout>
+</ScrollView>

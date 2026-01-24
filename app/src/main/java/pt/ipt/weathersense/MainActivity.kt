@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnToggleCard: ImageButton
     private lateinit var btnFavAction: Button
     private var favoriteCitiesList: MutableList<String> = ArrayList()
+    private lateinit var btnAbout: ImageButton
 
 
 
@@ -90,6 +91,7 @@ class MainActivity : AppCompatActivity() {
         groupCardContent = findViewById(R.id.groupCardContent)
         btnToggleCard = findViewById(R.id.btnToggleCard)
         btnFavAction = findViewById(R.id.btnFavAction)
+        btnAbout = findViewById<ImageButton>(R.id.btnAbout)
 
 
         // Initialize location provider
@@ -115,6 +117,14 @@ class MainActivity : AppCompatActivity() {
 
         btnToggleCard.setOnClickListener {
             toggleCardVisibility()
+        }
+
+
+
+
+        btnAbout.setOnClickListener {
+            val intent = Intent(this, AboutActivity::class.java)
+            startActivity(intent)
         }
 
         setupFavoritesGrid()
@@ -560,16 +570,29 @@ class MainActivity : AppCompatActivity() {
 
         if (isLoggedIn && userId != null) {
             btnFavAction.visibility = View.VISIBLE
-            val isFavorite = favoriteCitiesList.any { it.equals(currentCity, ignoreCase = true) }
 
+            // Verifica se a cidade está na lista de favoritos
             if (favoriteCitiesList.contains(currentCity)) {
+                // caso já seja favorito -> Botão serve para remover
                 btnFavAction.text = "Remover dos Favoritos"
 
                 btnFavAction.setOnClickListener {
-                    deleteFavoriteCity(userId, currentCity)
+                    // Diálogo de Confirmação
+                    AlertDialog.Builder(this)
+                        .setTitle("Remover Favorito")
+                        .setMessage("Tem a certeza que deseja remover $currentCity dos favoritos?")
+                        .setPositiveButton("Sim") { dialog, _ ->
+                            // Só apaga se o utilizador disser "Sim"
+                            deleteFavoriteCity(userId, currentCity)
+                            dialog.dismiss()
+                        }
+                        .setNegativeButton("Não") { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
                 }
             } else {
-
+                // caso não seja favorito -> Botão serve para adicionar
                 btnFavAction.text = "Adicionar aos Favoritos"
                 btnFavAction.setOnClickListener {
                     saveCityToBackend(userId, currentCity)

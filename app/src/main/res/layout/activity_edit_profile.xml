@@ -29,7 +29,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Alterar Password"
+                android:text="Alterar Palavra-Passe"
                 android:textColor="#1565C0"
                 android:textSize="26sp"
                 android:textStyle="bold"
@@ -39,7 +39,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nova Password"
+                android:hint="Nova Palavra-Passe"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxStrokeColor="#1565C0"
                 app:endIconMode="password_toggle"

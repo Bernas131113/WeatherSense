@@ -40,7 +40,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Username"
+                android:hint="Nome de Utilizador"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxStrokeColor="#1565C0"
                 app:startIconDrawable="@android:drawable/ic_menu_report_image"
@@ -58,7 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:hint="Password"
+                android:hint="Palavra-Passe"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxStrokeColor="#1565C0"
                 app:endIconMode="password_toggle"

@@ -10,7 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 class AboutActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge() // Permite que a UI se estenda para trás das barras de sistema
         setContentView(R.layout.activity_about)
 
 

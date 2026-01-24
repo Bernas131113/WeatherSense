@@ -10,21 +10,26 @@ import com.bumptech.glide.Glide
 import pt.ipt.weathersense.R
 import pt.ipt.weathersense.models.ForecastItem
 
+// Adaptador para a lista de previsões meteorológicas (RecyclerView)
 class ForecastAdapter(private val forecastList: List<ForecastItem>) :
     RecyclerView.Adapter<ForecastAdapter.ViewHolder>() {
 
+    // A classe ViewHolder guarda as referências para os elementos visuais de CADA item da lista
+    // (Dia da semana, Temperatura e Ícone) para não ter de os procurar repetidamente
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvDay: TextView = view.findViewById(R.id.tvDay)
         val tvTemp: TextView = view.findViewById(R.id.tvForecastTemp)
         val ivIcon: ImageView = view.findViewById(R.id.ivForecastIcon)
     }
 
+    // Cria a vista visual para um novo item quando necessário (infla o layout XML)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_forecast, parent, false)
         return ViewHolder(view)
     }
 
+    // Preenche os dados de um item específico na posição 'position'
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = forecastList[position]
         holder.tvDay.text = item.dayOfWeek
@@ -36,5 +41,6 @@ class ForecastAdapter(private val forecastList: List<ForecastItem>) :
             .into(holder.ivIcon)
     }
 
+    // Indica à lista quantos itens existem no total
     override fun getItemCount() = forecastList.size
 }

@@ -22,12 +22,14 @@ class EditProfileActivity : AppCompatActivity() {
         val btnSave = findViewById<Button>(R.id.btnSave)
         val btnCancel = findViewById<Button>(R.id.btnCancel)
 
+        // Botão Cancelar apenas fecha a atividade atual
         btnCancel.setOnClickListener { finish() }
 
         btnSave.setOnClickListener {
             val newPass = etNewPassword.text.toString()
 
             if (newPass.isNotEmpty()) {
+                // Recuperar o ID do utilizador logado através das SharedPreferences (Sessão)
                 val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
                 val userId = sharedPref.getString("USER_ID", null)
 
@@ -42,12 +44,15 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
 
+    // Função que comunica com a API para atualizar a password no servidor
     private fun updatePassword(userId: String, newPass: String) {
+        // Coroutine na thread de IO para operações de rede
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // Chama a nova rota da API
+                // Chama a rota /update-password definida na API
                 val response = RetrofitClient.instance.updatePassword(UpdatePasswordRequest(userId, newPass))
 
+                // Volta à thread principal (Main) para mostrar o resultado ao utilizador
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@EditProfileActivity, "Password alterada com sucesso!", Toast.LENGTH_LONG).show()

@@ -47,6 +47,7 @@ import pt.ipt.weathersense.models.ForecastItem
 
 import java.util.Date
 class MainActivity : AppCompatActivity() {
+    // Declaração de componentes da interface e variáveis de estado
     private lateinit var button: Button
     private lateinit var tvTemperature: TextView
     private lateinit var tvFeelsLike: TextView
@@ -70,8 +71,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        // Ajusta o layout para não ficar tapado pelas barras de sistema (topo e fundo)
         val mainView = findViewById<androidx.constraintlayout.widget.ConstraintLayout>(R.id.main)
-
         ViewCompat.setOnApplyWindowInsetsListener(mainView) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             // Aplica padding para evitar a barra de estado (topo) e a barra de navegação (fundo)
@@ -79,6 +80,8 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        // Inicialização dos componentes da UI
+        val btnLogin = findViewById<Button>(R.id.btnGoToLogin)
         tvTemperature = findViewById(R.id.tvTemperature)
         tvFeelsLike = findViewById(R.id.tvFeelsLike)
         tvWind = findViewById(R.id.tvWind)
@@ -94,58 +97,60 @@ class MainActivity : AppCompatActivity() {
         btnAbout = findViewById<ImageButton>(R.id.btnAbout)
 
 
-        // Initialize location provider
+        // Inicializa o cliente de localização (Google Play Services)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         checkLocationPermission()
 
+        // Configuração dos Listeners (botões)
         button.setOnClickListener {
-            checkLocationPermission()
+            checkLocationPermission() // Tenta obter localização novamente
         }
-        val btnLogin = findViewById<Button>(R.id.btnGoToLogin)
+
 
         searchLocation.setOnClickListener {
-            showSearchDialog()
+            showSearchDialog() // Abre popup de pesquisa
         }
 
 
         btnLogin.setOnClickListener {
-
+            // Navega para o ecrã de login
             val intent = Intent(this, LoginActivity::class.java)
-
             startActivity(intent)
         }
 
+        // Lógica para expandir/colapsar o cartão de tempo
         btnToggleCard.setOnClickListener {
             toggleCardVisibility()
         }
 
-
-
-
+        // Navegação para o ecrã "Sobre"
         btnAbout.setOnClickListener {
             val intent = Intent(this, AboutActivity::class.java)
             startActivity(intent)
         }
 
+        // Carrega a grelha de favoritos ao iniciar
         setupFavoritesGrid()
     }
 
+    // Verifica se a app tem permissão para aceder ao GPS
     private fun checkLocationPermission() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            // Request location permissions
+            // Se não tem, pede permissão ao utilizador
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
                 LOCATION_PERMISSION_REQUEST_CODE
             )
         } else {
-            // Permissions already granted, fetch location
+            // Se já tem, procura a localização atual
             fetchLocation()
         }
     }
 
+    // Callback recebido após o utilizador aceitar/negar permissões
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
@@ -158,7 +163,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
+    // Obtém a última localização conhecida do dispositivo
     @SuppressLint("MissingPermission")
     private fun fetchLocation() {
         fusedLocationClient.lastLocation
@@ -166,13 +171,10 @@ class MainActivity : AppCompatActivity() {
                 if (location != null) {
                     val latitude = location.latitude
                     val longitude = location.longitude
+                    // Constrói URL da API OpenWeather com as coordenadas
                     val weatherUrl = "https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&units=metric&appid=$API_KEY"
 
-                    // Debugging: Log URL
-                    println("Weather API URL: $weatherUrl")
-
                     fetchWeatherData(weatherUrl)
-
                 } else {
                     tvTemperature.text = "Could not get location."
                 }
@@ -182,19 +184,19 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    // Faz o pedido HTTP à API OpenWeather (com o Volley)
     private fun fetchWeatherData(url: String) {
         val queue = Volley.newRequestQueue(this)
 
         val request = StringRequest(Request.Method.GET, url,
             { response ->
                 try {
+                    // Parse do JSON recebido
                     val jsonResponse = JSONObject(response)
 
                     val main = jsonResponse.getJSONObject("main")
                     val temp = main.getDouble("temp").toInt().toString()
                     val feelsLike = main.getDouble("feels_like").toInt().toString()
-
-
                     val city = jsonResponse.getString("name")
 
                     val windObj = jsonResponse.getJSONObject("wind")
@@ -204,8 +206,7 @@ class MainActivity : AppCompatActivity() {
                     val weatherObj = weatherArray.getJSONObject(0)
                     val iconCode = weatherObj.getString("icon")
 
-                    // Calcular horas
-                    // Obter o "shift" em segundos (ex: 3600)
+                    // Cálculo da hora local da cidade pesquisada (considerando o fuso horário)
                     val timezoneOffset = jsonResponse.getLong("timezone")
                     // Obter a hora atual em UTC
                     val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
@@ -217,14 +218,14 @@ class MainActivity : AppCompatActivity() {
                     // Construir o URL da imagem (4x para ficar com melhor qualidade)
                     val iconUrl = "https://openweathermap.org/img/wn/$iconCode@4x.png"
 
-                    // Formatar as horas
+                    // Formatação da hora
                     val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
                     // Garantir que não soma o fuso do telemóvel
                     sdf.timeZone = TimeZone.getTimeZone("UTC")
                     val localTime = sdf.format(calendar.time)
 
 
-                    // Usar as variaveis globais
+                    // Atualiza a UI com os dados
                     tvCity.text = city
                     tvTemperature.text = "${temp}°C "
                     tvFeelsLike.text = "Sensação: ${feelsLike}°C"
@@ -236,17 +237,15 @@ class MainActivity : AppCompatActivity() {
                         .load(iconUrl)
                         .into(ivWeatherIcon)
 
+                    // Atualiza estado do botão de favoritos (Adicionar vs Remover)
                     updateFavoriteButtonState(city)
 
+                    // Previsão futura baseada nestas coordenadas
                     val coord = jsonResponse.getJSONObject("coord")
                     val lat = coord.getDouble("lat")
                     val lon = coord.getDouble("lon")
-
-
                     fetchForecast(lat,lon)
-
                 } catch (e: Exception) {
-                    // Podes usar o tvDescription para mostrar erro se quiseres
                     tvTemperature.text = "Erro ao ler dados"
                     e.printStackTrace()
                 }
@@ -263,6 +262,7 @@ class MainActivity : AppCompatActivity() {
         const val LOCATION_PERMISSION_REQUEST_CODE = 100
     }
 
+    // Previsão para os próximos dias (Forecast 5 days)
     private fun fetchForecast(latitude: Double, longitude: Double) {
         val url = "https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$longitude&units=metric&appid=$API_KEY"
 
@@ -281,6 +281,7 @@ class MainActivity : AppCompatActivity() {
                     val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                     val dayFormat = SimpleDateFormat("EEE", Locale.getDefault()) // Ex: "Seg"
 
+                    // Itera sobre a lista de previsões (3 em 3 horas)
                     for (i in 0 until list.length()) {
                         val itemObj = list.getJSONObject(i)
 
@@ -313,6 +314,7 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
+                    // Configura a lista horizontal (RecyclerView)
                     val rvForecast = findViewById<RecyclerView>(R.id.rvForecast)
                     rvForecast.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
                     rvForecast.adapter = ForecastAdapter(forecastItems)
@@ -328,51 +330,47 @@ class MainActivity : AppCompatActivity() {
         Volley.newRequestQueue(this).add(request)
     }
 
+    // Chamado sempre que o ecrã volta a ficar visível (ex: após login)
     override fun onResume() {
         super.onResume()
 
+        // Verifica estado da sessão nas SharedPreferences
         val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
         val isLoggedIn = sharedPref.getBoolean("IS_LOGGED_IN", false)
         val username = sharedPref.getString("USER_NAME", "User")
 
         val btnLogin = findViewById<Button>(R.id.btnGoToLogin)
         val rvFavorites = findViewById<RecyclerView>(R.id.rvFavorites)
-
-        // --- 1. Tens esta linha aqui? ---
         val btnChangePass = findViewById<Button>(R.id.btnChangePass)
 
         if (isLoggedIn) {
-            // ESTADO: LOGADO
+            // UI para utilizador autenticado
             btnLogin.text = "Logout"
-
             tvUserEmail.text = "Olá, $username"
             tvUserEmail.visibility = View.VISIBLE
-
-            // --- 2. E este bloco aqui? ---
             btnChangePass.visibility = View.VISIBLE
             btnChangePass.setOnClickListener {
                 val intent = Intent(this, EditProfileActivity::class.java)
                 startActivity(intent)
             }
-            // ---------------------------
 
+            // Lógica de Logout
             btnLogin.setOnClickListener {
                 sharedPref.edit().clear().apply()
                 Toast.makeText(this, "Logout feito!", Toast.LENGTH_SHORT).show()
                 favoriteCitiesList.clear()
-                onResume() // Recarrega o ecrã para esconder as coisas
+                onResume() // Recarrega UI
             }
 
             rvFavorites.visibility = View.VISIBLE
+            // Carrega favoritos do backend
             setupFavoritesGrid()
 
         } else {
-            // ESTADO: NÃO LOGADO
+            // UI para visitante
             btnLogin.text = "Login"
             tvUserEmail.visibility = View.GONE
             btnFavAction.visibility = View.GONE
-
-            // --- 3. Garante que ele desaparece se não houver login ---
             btnChangePass.visibility = View.GONE
 
             btnLogin.setOnClickListener {
@@ -389,13 +387,12 @@ class MainActivity : AppCompatActivity() {
         val userId = sharedPref.getString("USER_ID", null)
 
         if (userId != null) {
-            // User is logged in, fetch data
             fetchFavorites(userId)
         } else {
-            // User is logged out, clear the grid (optional)
         }
     }
 
+    // Carrega a lista de cidades favoritas do utilizador (via API Backend/Retrofit)
     private fun fetchFavorites(userId: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -405,18 +402,18 @@ class MainActivity : AppCompatActivity() {
                     if (response.isSuccessful && response.body() != null) {
                         val cities = response.body()!!.favorites
                         favoriteCitiesList = cities.toMutableList()
+
+                        // Configura a lista vertical de favoritos
                         val rvFavorites = findViewById<RecyclerView>(R.id.rvFavorites)
 
                         rvFavorites.layoutManager = GridLayoutManager(this@MainActivity, 1)
                         rvFavorites.adapter = FavoritesAdapter(
                             cities,
                             onCityClick = { clickedCityName ->
-                                // 1. Ver Tempo
-                                //Toast.makeText(this@MainActivity, "Loading $clickedCityName...", Toast.LENGTH_SHORT).show()
+                                // Ao clicar num favorito, carrega o tempo dessa cidade
                                 val weatherUrl = "https://api.openweathermap.org/data/2.5/weather?q=$clickedCityName&units=metric&appid=$API_KEY"
                                 fetchWeatherData(weatherUrl)
                             },
-
                         )
                     }
                 }
@@ -426,73 +423,32 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-    private fun testAddFavorite(userId: String, city: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            RetrofitClient.instance.addFavorite(AddFavoriteRequest(userId, city))
-            // After adding, refresh the list
-            fetchFavorites(userId)
-        }
-    }
 
-    private fun showAddCityDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Add Favorite City")
-
-        // Set up the input
-        val input = EditText(this)
-        input.hint = "Enter city name (e.g. Tokyo)"
-        builder.setView(input)
-
-        // Set up the buttons
-        builder.setPositiveButton("Add") { dialog, which ->
-            val cityName = input.text.toString()
-            if (cityName.isNotEmpty()) {
-                // Get User ID
-                val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
-                val userId = sharedPref.getString("USER_ID", null)
-
-                if (userId != null) {
-                    saveCityToBackend(userId, cityName)
-                } else {
-                    Toast.makeText(this, "Please login first!", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-        builder.setNegativeButton("Cancel") { dialog, which -> dialog.cancel() }
-
-        builder.show()
-    }
-
+    // Mostra diálogo para pesquisar uma cidade manualmente
     private fun showSearchDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Pesquisar Localização")
 
-        // configurar o input
+        // Configurar o input
         val input = EditText(this)
         input.hint = "Introduza o nome da cidade (ex: Porto)"
         input.inputType = android.text.InputType.TYPE_CLASS_TEXT
         builder.setView(input)
 
-        // botões
         builder.setPositiveButton("Pesquisar") { dialog, which ->
             val cityName = input.text.toString().trim()
             if (cityName.isNotEmpty()) {
-
-                // construir o URL da API para essa cidade
+                // Construir o URL da API para essa cidade
                 val weatherUrl = "https://api.openweathermap.org/data/2.5/weather?q=$cityName&units=metric&appid=$API_KEY"
-
-
-                // funcao que ja temos
                 fetchWeatherData(weatherUrl)
             }
         }
 
+        // Opção para abrir o Google Maps
         builder.setNeutralButton("Google Maps") { dialog, which ->
-            // Abrir o mapa
             val intent = Intent(this, MapPickerActivity::class.java)
             mapPickerLauncher.launch(intent)
         }
-
         builder.setNegativeButton("Cancelar") { dialog, which ->
             dialog.cancel()
         }
@@ -500,6 +456,7 @@ class MainActivity : AppCompatActivity() {
         builder.show()
     }
 
+    // Guarda cidade nos favoritos (chamada ao Backend)
     private fun saveCityToBackend(userId: String, cityName: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -507,7 +464,7 @@ class MainActivity : AppCompatActivity() {
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@MainActivity, "$cityName adicionado aos favoritos!", Toast.LENGTH_SHORT).show()
-                        // refresh grid
+                        // Atualiza lista
                         fetchFavorites(userId)
                         favoriteCitiesList.add(cityName)
                         updateFavoriteButtonState(cityName)
@@ -520,18 +477,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    // Remove uma cidade dos favoritos chamando a API
     private fun deleteFavoriteCity(userId: String, cityName: String) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // Reutilizamos AddFavoriteRequest pq os dados são os mesmos (ID e Cidade)
+                // Reutilizamos o objeto AddFavoriteRequest porque os dados necessários são os mesmos (ID do user e Nome da cidade)
                 val response = RetrofitClient.instance.removeFavorite(AddFavoriteRequest(userId, cityName))
 
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
                         Toast.makeText(this@MainActivity, "$cityName removido dos favoritos!", Toast.LENGTH_SHORT).show()
-                        // Atualiza a grelha
+                        // Atualiza lista
                         fetchFavorites(userId)
                         favoriteCitiesList.remove(cityName)
+                        // Atualiza o botão para permitir adicionar novamente se necessário
                         updateFavoriteButtonState(cityName)
                     } else {
                         Toast.makeText(this@MainActivity, "Erro a remover a cidade", Toast.LENGTH_SHORT).show()
@@ -542,13 +502,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+    // Expande ou recolhe o cartão com os detalhes do tempo
     private fun toggleCardVisibility() {
         isCardExpanded = !isCardExpanded
 
         if (isCardExpanded) {
-
+            // Mostra os detalhes e muda o ícone para "fechar"
             groupCardContent.visibility = View.VISIBLE
             btnToggleCard.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+            // Só mostra o botão de favoritos se o utilizador estiver logado
             val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
             val isLoggedIn = sharedPref.getBoolean("IS_LOGGED_IN", false)
             if (isLoggedIn) {
@@ -557,12 +520,14 @@ class MainActivity : AppCompatActivity() {
                 btnFavAction.visibility = View.GONE
             }
         } else {
+            // Esconde os detalhes e o botão de favoritos
             groupCardContent.visibility = View.GONE
             btnFavAction.visibility = View.GONE
             btnToggleCard.setImageResource(android.R.drawable.ic_input_add)
         }
     }
 
+    // Atualiza o estado e comportamento do botão de favoritos (Adicionar vs Remover)
     private fun updateFavoriteButtonState(currentCity: String) {
         val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
         val isLoggedIn = sharedPref.getBoolean("IS_LOGGED_IN", false)
@@ -571,18 +536,18 @@ class MainActivity : AppCompatActivity() {
         if (isLoggedIn && userId != null) {
             btnFavAction.visibility = View.VISIBLE
 
-            // Verifica se a cidade está na lista de favoritos
+            // Verifica se a cidade atual já está na lista de favoritos
             if (favoriteCitiesList.contains(currentCity)) {
                 // caso já seja favorito -> Botão serve para remover
                 btnFavAction.text = "Remover dos Favoritos"
 
                 btnFavAction.setOnClickListener {
-                    // Diálogo de Confirmação
+                    // Cria um AlertDialog para confirmar a remoção (Requisito de segurança)
                     AlertDialog.Builder(this)
                         .setTitle("Remover Favorito")
                         .setMessage("Tem a certeza que deseja remover $currentCity dos favoritos?")
                         .setPositiveButton("Sim") { dialog, _ ->
-                            // Só apaga se o utilizador disser "Sim"
+                            // Só executa a remoção se o utilizador confirmar
                             deleteFavoriteCity(userId, currentCity)
                             dialog.dismiss()
                         }
@@ -603,12 +568,14 @@ class MainActivity : AppCompatActivity() {
             btnFavAction.visibility = View.GONE
         }
     }
+    // Recebe o resultado da seleção no Google Maps (Activity MapPicker)
     private val mapPickerLauncher = registerForActivityResult(
         androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) {
             val data = result.data
             if (data != null) {
+                // Obtém as coordenadas enviadas pela MapPickerActivity
                 val lat = data.getDoubleExtra("lat", 0.0)
                 val lon = data.getDoubleExtra("lon", 0.0)
 

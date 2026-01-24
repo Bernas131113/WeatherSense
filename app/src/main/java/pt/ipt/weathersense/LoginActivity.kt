@@ -32,11 +32,12 @@ class LoginActivity : AppCompatActivity() {
             val username = usernameInput.text.toString()
             val password = passInput.text.toString()
 
+            // Validação simples dos campos
             if(username.isNotEmpty() && password.isNotEmpty()) {
-                // 1. AVISAR QUE ESTÁ A TENTAR
+
                 Toast.makeText(this, "A conectar ao servidor...", Toast.LENGTH_SHORT).show()
 
-                // 2. Desativar botão para não clicar 2 vezes
+                // Validação simples dos campos
                 btnLogin.isEnabled = false
                 btnLogin.text = "A carregar..."
 
@@ -46,28 +47,35 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
+        // Navegação para o ecrã de registo
         btnRegister.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
         }
     }
 
+    // Função para efetuar login usando a API
     private fun loginUser(username: String, pass: String) {
+        // Inicia Coroutine na Thread de IO (Input/Output) para não bloquear a UI
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                // Chamada de rede pelo Retrofit
                 val response = RetrofitClient.instance.login(AuthRequest(username, pass))
+
+                // Volta à Thread Principal para atualizar a UI
                 withContext(Dispatchers.Main) {
                     if (response.isSuccessful) {
+                        // Login com sucesso: Guarda sessão nas SharedPreferences
                         val sharedPref = getSharedPreferences("WeatherAppSession", MODE_PRIVATE)
                         val editor = sharedPref.edit()
                         val userId = response.body()?.userId
                         editor.putString("USER_NAME", username)
                         editor.putBoolean("IS_LOGGED_IN", true)
-                        editor.putString("USER_ID", userId) //guarda o USER_ID
-                        editor.apply()
+                        editor.putString("USER_ID", userId)
+                        editor.apply() // Commit das alterações
                         Toast.makeText(this@LoginActivity, "Login com sucesso!", Toast.LENGTH_SHORT).show()
 
-                        finish()
+                        finish() // Fecha a atividade de login e volta à Main
                     } else {
                         Toast.makeText(this@LoginActivity, "Login falhado", Toast.LENGTH_SHORT).show()
                     }

@@ -13,6 +13,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 
+
+// Implementa OnMapReadyCallback para saber quando o mapa terminou de carregar
 class MapPickerActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
@@ -43,10 +45,11 @@ class MapPickerActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    // Chamado automaticamente quando o mapa está pronto a ser usado
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Mover a câmara para Portugal inicialmente (Opcional)
+        // Mover a câmara para Portugal inicialmente
         val portugal = LatLng(39.5, -8.0)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(portugal, 6f))
 
